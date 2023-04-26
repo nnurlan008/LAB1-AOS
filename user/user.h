@@ -1,5 +1,13 @@
 struct stat;
 
+// adding pinfo struct for lab1
+struct pinfo {
+  int ppid;
+  int syscall_count; 
+  int page_usage; 
+};
+
+
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -22,6 +30,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int sysinfo(int);// lab1: user definition for sysinfo system call
+int procinfo(struct pinfo*); // lab1: user definition for procinfo system call
 
 // ulib.c
 int stat(const char*, struct stat*);

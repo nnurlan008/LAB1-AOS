@@ -125,13 +125,15 @@ found:
   p->pid = allocpid();
   p->state = USED;
 
+  p->psyscall_count = 0;// lab1 syscall count for each process is initialized to 0
+  
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     freeproc(p);
     release(&p->lock);
     return 0;
-  }
-
+  }   
+      
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -681,3 +683,45 @@ procdump(void)
     printf("\n");
   }
 }
+
+int sysinfo(int n) {
+  if (n == 0) {
+     
+     struct proc *pr;
+     int active_proc_count = 0;
+     // loop throught the process to see which/how many of them are active
+     for(pr = proc; pr < &proc[NPROC]; pr++){
+       if(pr->state == RUNNABLE || pr->state == RUNNING 
+	  || pr->state == SLEEPING || pr->state == ZOMBIE) {
+         active_proc_count++;
+       }
+     }
+     return active_proc_count;
+  }
+  else if (n == 1) {
+    return get_syscall_count() - 1;// not counting this syscall
+  }
+  else if (n == 2) {
+    int number = kfree_mem_pages(); // use this function to get free page count
+    return number;
+  }
+  else {
+    return -1; 
+  }
+}
+
+int procinfo(struct pinfo* pinfo_input) {
+  
+  struct proc* p = myproc(); // current process
+  
+  int number_syscalls = p->psyscall_count - 1;
+  int ppid = p->parent->pid;
+  int page_used = (PGROUNDUP(p->sz))/PGSIZE;
+                        
+  if(copyout(p->pagetable, (uint64) &pinfo_input->ppid, (char *)&ppid, sizeof(int)) < 0 
+     || copyout(p->pagetable, (uint64) &pinfo_input->page_usage, (char *)&page_used, sizeof(int)) < 0
+     || copyout(p->pagetable, (uint64) &pinfo_input->syscall_count, (char *)&number_syscalls, sizeof(int)) < 0)
+     return -1; // not successfull
+  
+  return 0; // successful                
+}                           

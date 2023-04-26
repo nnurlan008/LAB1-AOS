@@ -89,3 +89,20 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
+// additions for lab1:
+uint64 
+sys_sysinfo(void) 
+{ // sysinfo syscall definition
+  int n;
+  argint(0, &n);
+  return sysinfo(n);
+}
+uint64 
+sys_procinfo(void) 
+{ // procinfo syscall definition
+  struct pinfo *user_pinfo;
+  argaddr(0, (void *)&user_pinfo);
+  return procinfo(user_pinfo);
+}

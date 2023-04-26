@@ -80,3 +80,18 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+
+int kfree_mem_pages(void) {
+  int count_free_pages = 0;
+  acquire(&kmem.lock); // acquire the lock to not count the pages while they are being allocated
+  struct run* free_list = kmem.freelist;
+  // use the freelist
+  while(free_list != 0) {
+    
+    count_free_pages++; // increment count free pages cariable
+
+    free_list = free_list->next;
+  }
+  release(&kmem.lock);
+  return count_free_pages;
+}

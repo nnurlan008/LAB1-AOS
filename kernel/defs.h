@@ -8,6 +8,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct pinfo;
 
 // bio.c
 void            binit(void);
@@ -63,6 +64,7 @@ void            ramdiskrw(struct buf*);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
+int             kfree_mem_pages(void); // lab1: returns the number of free memory pages 
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -107,6 +109,11 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 
+int 		sysinfo(int); // lab1 system definition
+int             procinfo(struct pinfo*); // lab1 system definition
+
+
+
 // swtch.S
 void            swtch(struct context*, struct context*);
 
@@ -140,6 +147,7 @@ void            argaddr(int, uint64 *);
 int             fetchstr(uint64, char*, int);
 int             fetchaddr(uint64, uint64*);
 void            syscall();
+int             get_syscall_count(void);
 
 // trap.c
 extern uint     ticks;
